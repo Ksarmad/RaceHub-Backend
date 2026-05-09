@@ -16,16 +16,18 @@ import rateLimiter from "./common/middleware/rateLimiter";
 
 const app = express();
 
-app.use(
-  cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? ["https://yourfrontenddomain.com"]
-        : "*",
+// app.use(
+//   cors({
+//     origin:
+//       process.env.NODE_ENV === "production"
+//         ? ["https://racehub-backend-6ydb.onrender.com/api"]
+//         : "*",
 
-    credentials: true,
-  })
-);
+//     credentials: true,
+//   })
+// );
+
+app.use(cors())
 
 app.use(
   express.json({
