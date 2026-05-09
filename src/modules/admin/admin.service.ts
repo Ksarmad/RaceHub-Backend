@@ -1,4 +1,5 @@
-import AppError from "../../common/utils/AppError";
+
+import AppError from "../../common/errors/AppError";
 import prisma from "../../config/prisma";
 
 export class AdminService {
