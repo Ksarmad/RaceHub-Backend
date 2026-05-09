@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Registration {
+  id          String       @id @default(cuid())
+
+  name        String
+  email       String
+  phone       String       @unique
+
+  createdAt   DateTime     @default(now())
+
+  assignment  Assignment?
+
+  @@map("registrations")
+}
+
+model TimeSlot {
+  id           String       @id @default(cuid())
+
+  slotTime     String       @unique
+
+  isAssigned   Boolean      @default(false)
+
+  assignment   Assignment?
+
+  createdAt    DateTime     @default(now())
+
+  @@map("timeslots")
+}
+
+model Assignment {
+  id               String        @id @default(cuid())
+
+  registrationId   String        @unique
+  timeslotId       String        @unique
+
+  registration     Registration  @relation(fields: [registrationId], references: [id])
+
+  timeslot          TimeSlot      @relation(fields: [timeslotId], references: [id])
+
+  assignedAt       DateTime      @default(now())
+
+  @@map("assignments")
+}
+
+model Admin {
+  id          String      @id @default(cuid())
+
+  email       String      @unique
+
+  password    String
+
+  createdAt   DateTime    @default(now())
+
+  @@map("admins")
+}
