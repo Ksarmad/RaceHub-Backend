@@ -1,3 +1,4 @@
+import AppError from "../../common/utils/AppError";
 import prisma from "../../config/prisma";
 
 export class AdminService {
@@ -18,6 +19,7 @@ export class AdminService {
 
     return registrations;
   }
+
   static async getAvailableTimeslots() {
     return prisma.timeSlot.findMany({
       where: {
@@ -29,67 +31,53 @@ export class AdminService {
       },
     });
   }
-  static async assignTimeslot(
-  data: {
-    userId: string;
-    timeslotId: string;
-  }
-) {
-  // Check if user already assigned
-  const existingAssignment =
-    await prisma.assignment.findUnique({
+
+  static async assignTimeslot(data: { userId: string; timeslotId: string }) {
+    // Check if user already assigned
+    const existingAssignment = await prisma.assignment.findUnique({
       where: {
-        userId: data.userId,
+        registrationId: data.userId,
       },
     });
 
-  if (existingAssignment) {
-    throw new Error(
-      "User already assigned"
-    );
-  }
+    if (existingAssignment) {
+      throw new AppError("User already assigned", 400);
+    }
 
-  // Check if slot available
-  const slot =
-    await prisma.timeslot.findUnique({
+    // Check if slot available
+    const slot = await prisma.timeSlot.findUnique({
       where: {
         id: data.timeslotId,
       },
     });
 
-  if (!slot || slot.isAssigned) {
-    throw new Error(
-      "Timeslot unavailable"
-    );
+    if (!slot || slot.isAssigned) {
+      throw new AppError("Timeslot unavailable", 400);
+    }
+
+    // Transaction
+    const assignment = await prisma.$transaction(async (tx: any) => {
+      const createdAssignment = await tx.assignment.create({
+        data: {
+          registrationId: data.userId,
+
+          timeslotId: data.timeslotId,
+        },
+      });
+
+      await tx.timeSlot.update({
+        where: {
+          id: data.timeslotId,
+        },
+
+        data: {
+          isAssigned: true,
+        },
+      });
+
+      return createdAssignment;
+    });
+
+    return assignment;
   }
-
-  // Transaction
-  const assignment =
-    await prisma.$transaction(
-      async (tx) => {
-        const createdAssignment =
-          await tx.assignment.create({
-            data: {
-              userId: data.userId,
-              timeslotId:
-                data.timeslotId,
-            },
-          });
-
-        await tx.timeslot.update({
-          where: {
-            id: data.timeslotId,
-          },
-
-          data: {
-            isAssigned: true,
-          },
-        });
-
-        return createdAssignment;
-      }
-    );
-
-  return assignment;
-}
 }
