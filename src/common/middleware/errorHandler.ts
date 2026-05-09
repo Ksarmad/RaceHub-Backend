@@ -41,6 +41,14 @@ const errorHandler = (
     });
   }
 
+  // If we have a message from a non-AppError, surface it for better frontend errors
+  if (error?.message) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+
   // Default Error
   return res.status(500).json({
     success: false,

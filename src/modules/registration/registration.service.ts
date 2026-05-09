@@ -29,9 +29,16 @@ export class RegistrationService {
         name: user.name,
         phone: user.phone,
       });
+
+      return user;
     } catch (error) {
+      // Registration should fail if notifications cannot be sent in production
+      // so frontend shows a real error instead of staying "pending".
       console.error("Email sending failed:", error);
+      throw new AppError(
+        "Registration created but notification email failed. Please try again later.",
+        503
+      );
     }
-    return user;
   }
 }
