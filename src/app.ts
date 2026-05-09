@@ -9,6 +9,7 @@ import registrationRoutes from "./modules/registration/registration.routes";
 import authRoutes from "./modules/auth/auth.routes";
 import authMiddleware from "./common/middleware/authMiddleware";
 import adminRoutes from "./modules/admin/admin.routes";
+import leaderboardRoutes from "./modules/leaderboard/leaderboard.routes";
 
 import errorHandler from "./common/middleware/errorHandler";
 
@@ -76,7 +77,9 @@ app.get(
 app.use("/api", registrationRoutes);
 app.use("/api", authRoutes);
 app.use("/api", adminRoutes);
+app.use("/api", leaderboardRoutes);
 
 app.use(errorHandler);
+
 
 export default app;

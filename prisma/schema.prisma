@@ -17,9 +17,11 @@ model Registration {
   createdAt   DateTime     @default(now())
 
   assignment  Assignment?
+  result      Result?
 
   @@map("registrations")
 }
+
 
 model TimeSlot {
   id           String       @id @default(cuid())
@@ -50,7 +52,23 @@ model Assignment {
   @@map("assignments")
 }
 
+model Result {
+  id             String       @id @default(cuid())
+  registrationId String       @unique
+
+  finishTime    String
+  finishTimeMs  Int
+
+  updatedAt      DateTime     @updatedAt
+
+  registration   Registration @relation(fields: [registrationId], references: [id])
+
+  @@map("results")
+}
+
+
 model Admin {
+
   id          String      @id @default(cuid())
 
   email       String      @unique
