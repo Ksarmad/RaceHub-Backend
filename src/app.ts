@@ -51,7 +51,7 @@ app.use(
 );
 
 app.use(compression());
-
+app.set("trust proxy", 1);
 app.use(rateLimiter);
 
 app.use(hpp());
